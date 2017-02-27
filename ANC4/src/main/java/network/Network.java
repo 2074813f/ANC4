@@ -1,5 +1,7 @@
 package network;
 
+import java.util.List;
+
 /**
  * Interface describing a simplified point-to-point
  * network.
@@ -30,4 +32,16 @@ public interface Network {
      * @param destination - the destination node
      **/
      public List<Device> bestRoute(Node source, Node destination);
+     
+     /**
+      * Return the number of nodes in the network.
+      * @return - no. of nodes
+      */
+     public int numNodes();
+     
+     /**
+      * Return the number of links in the network.
+      * @return - no. of links
+      */
+     public int numLinks();
 }
