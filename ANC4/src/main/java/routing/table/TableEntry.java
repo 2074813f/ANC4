@@ -14,10 +14,13 @@ import network.Node;
 public class TableEntry {
 	
 	private Node destination;
-	private float distance;
+	private int distance;
 	private Link outgoingLink;
 	
-	public TableEntry(){
+	public TableEntry(Node dest, int distance, Link outgoingLink){
+		this.destination = dest;
+		this.distance = distance;
+		this.outgoingLink = outgoingLink;
 	}
 	
 	public Node getDestination() {
@@ -26,10 +29,10 @@ public class TableEntry {
 	public void setDestination(Node destination) {
 		this.destination = destination;
 	}
-	public float getDistance() {
+	public int getDistance() {
 		return distance;
 	}
-	public void setDistance(float distance) {
+	public void setDistance(int distance) {
 		this.distance = distance;
 	}
 	public Link getOutgoingLink() {

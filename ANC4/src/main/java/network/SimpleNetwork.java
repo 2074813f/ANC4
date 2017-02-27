@@ -25,8 +25,17 @@ public class SimpleNetwork implements Network {
     
 	@Override
 	public void exchange(int iterations) {
-		// TODO Auto-generated method stub
-		
+		//Perform exchange <iterations> times.
+		for (int i=0; i<iterations; i++) {
+			//Exchange information between nodes on link.
+			links.entrySet().forEach(entry -> {
+				Node first = entry.getValue().getFirst();
+				Node second = entry.getValue().getSecond();
+				
+				first.updateTable(entry.getValue(), second);
+				second.updateTable(entry.getValue(), first);
+			});
+		}
 	}
 	@Override
 	public void changeLinkCost(Link link, int newCost) {
@@ -49,4 +58,16 @@ public class SimpleNetwork implements Network {
 		return links.size();
 	}
 
+	@Override
+	public Map<String, Node> getNodes() {
+		return nodes;
+	}
+	@Override
+	public Map<String, Link> getLinks() {
+		return links;
+	}
+	@Override
+	public boolean isSplitHorizon() {
+		return splitHorizon;
+	}
 }

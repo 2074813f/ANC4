@@ -11,6 +11,7 @@ import network.Link;
 import network.Network;
 import network.Node;
 import network.SimpleNetwork;
+import routing.table.TableEntry;
 
 /**
  * Class exposing functionality to read files describing networks.
@@ -75,6 +76,13 @@ public class DataReader {
 				
 				lineNumber++;
 				currentLine = reader.readLine();
+			}
+			
+			//##### POPULATE ROUTING TABLES #####
+			for (Link link : links.values()) {
+				//Populate each nodes routing tables with neighbor.
+				link.getFirst().getTable().addEntry(link.getSecond(), new TableEntry(link.getSecond(), link.getCost(), link));
+				link.getSecond().getTable().addEntry(link.getFirst(), new TableEntry(link.getFirst(), link.getCost(), link));
 			}
 			
 			//File read, now construct network.

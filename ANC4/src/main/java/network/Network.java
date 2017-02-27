@@ -1,6 +1,7 @@
 package network;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Interface describing a simplified point-to-point
@@ -44,4 +45,10 @@ public interface Network {
       * @return - no. of links
       */
      public int numLinks();
+     
+ 	public Map<String, Node> getNodes();
+ 	
+	public Map<String, Link> getLinks();
+	
+	public boolean isSplitHorizon();
 }
