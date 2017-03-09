@@ -17,47 +17,61 @@ import network.Node;
  */
 public class RoutingTable {
 	
-	private Map<Node, TableEntry> table;
+	private Map<String, TableEntry> table;
 	
 	public RoutingTable() {
-		this.table = new HashMap<Node, TableEntry>();
+		this.table = new HashMap<String, TableEntry>();
 	}
 	
 	/**
-	 * Update the routing table for this node by iterating through an
-	 * incoming table and checking each entry.
+	 * Add a new entry to the routing table.
 	 * 
-	 * @param entry - the incoming table to check.
+	 * @param nodeName - the name of the new node.
+	 * @param entry - the entry to input to the table.
 	 */
-	public void updateTable(Link link, Node node) {
-		RoutingTable incomingTable = node.getTable();
+	public void addEntry(String nodeName, TableEntry entry) {
+		this.table.put(nodeName, entry);
+	}
+	
+	/**
+	 * Try to get a node from the routing table.
+	 * 
+	 * @param nodeName
+	 * @return - the TableEntry associated with the node, or null
+	 * 			 if not found.
+	 */
+	public TableEntry getEntry(String nodeName) {
+		return table.get(nodeName);
+	}
+	
+	public Map<String, TableEntry> getTable() {
+		return this.table;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		//self check
+		if (this == o) return true;
+		//null check
+		if (o == null) return false;
+		//type check and cast
+		if (getClass() != o.getClass()) return false;
+		RoutingTable table = (RoutingTable) o;
 		
-		//Iterate through each entry in the table.
-		for (Entry<Node, TableEntry> entry : incomingTable.getTable().entrySet()) {
+		//Check size of tables.
+		if (this.getTable().size() != table.getTable().size()) return false;
+		
+		//Check each entry.
+		for(Entry<String, TableEntry> entry : table.getTable().entrySet()) {
+			TableEntry current = this.getEntry(entry.getKey());
 			
-			//Distance to this node = <link cost> + <entry distance>.
-			int newDistance = link.getCost() + entry.getValue().getDistance();
-			
-			/* Construct a new entry with:
-			 * 	- dest = table entry node
-			 * 	- distance = <link cost> + <entry distance>
-			 * 	- outgoingLink = link
-			 */
-			TableEntry newEntry = new TableEntry(entry.getKey(), newDistance, link);
-			
-			//If node doesn't exist OR if new cost < existing cost, add/update entry.
-			TableEntry existing = this.table.get(entry.getKey());
-			if ((existing == null) || (newDistance < existing.getDistance())) {
-				this.table.put(entry.getKey(), newEntry);
+			//If missing entry or entry values not equal then tables not equal.
+			if (current == null || current != entry.getValue()) {
+				return false;
 			}
 		}
-	}
-	
-	public void addEntry(Node node, TableEntry entry) {
-		this.table.put(node, entry);
-	}
-	
-	public Map<Node, TableEntry> getTable() {
-		return this.table;
+		
+		//All entries were equal so tables are equal.
+		return true;
 	}
 }

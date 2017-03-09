@@ -1,5 +1,8 @@
 package network;
 
+import routing.table.RoutingTable;
+import routing.table.TableEntry;
+
 /**
  * A link in a simplified
  * point-to-point network.
@@ -22,16 +25,6 @@ public class Link implements Device {
 	}
 	
 	/**
-	 * Broadcast routing tables between the two adjacent nodes.
-	 * 
-	 * i.e. broadcasts routing table of first -> second and
-	 * second -> first.
-	 */
-	public void broadcastUpdate() {
-		
-	}
-	
-	/**
 	 * Name comparison is used.
 	 */
 	@Override
@@ -49,9 +42,26 @@ public class Link implements Device {
 	public int getCost() {
 		return cost;
 	}
+	
+	/**
+	 * Updates the cost associated with the link.
+	 * 
+	 * NOTE: for simplicity this causes the RT entries for
+	 * linked neighbors to be updated/checked immediately.
+	 * 
+	 * @param cost
+	 */
 	public void setCost(int cost) {
+		//Change in cost = old cost - new cost.
+		//Difference is then summed with old entries to give new distance.
+		int costChange = cost - this.cost;
+		
+		first.linkUpdate(this, costChange);
+		second.linkUpdate(this, costChange);
+		
 		this.cost = cost;
 	}
+	
 	public String getName() {
 		return name;
 	}

@@ -1,5 +1,7 @@
 package routing.table;
 
+import java.util.Map.Entry;
+
 import network.Link;
 import network.Node;
 
@@ -21,6 +23,25 @@ public class TableEntry {
 		this.destination = dest;
 		this.distance = distance;
 		this.outgoingLink = outgoingLink;
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		//self check
+		if (this == o) return true;
+		//null check
+		if (o == null) return false;
+		//type check and cast
+		if (getClass() != o.getClass()) return false;
+		TableEntry entry = (TableEntry) o;
+		
+		//Check fields
+		if (this.getDestination() != entry.getDestination()) return false;
+		if (this.getDistance() !=  entry.getDistance()) return false;
+		if (this.getOutgoingLink() != entry.getOutgoingLink()) return false;
+		
+		//All fields were equal so entries are equal.
+		return true;
 	}
 	
 	public Node getDestination() {

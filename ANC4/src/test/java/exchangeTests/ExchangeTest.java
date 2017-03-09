@@ -8,6 +8,8 @@ import org.junit.Test;
 import network.Link;
 import network.Network;
 import network.Node;
+import network.SimpleNetwork;
+import routing.table.RoutingTable;
 import routing.table.TableEntry;
 import util.DataReader;
 
@@ -22,7 +24,7 @@ import util.DataReader;
  */
 public class ExchangeTest {
 	
-	Network network;
+	Network network;		//Network as read from file @T=0
 	
 	@Before
 	public void setUp() {
@@ -32,15 +34,15 @@ public class ExchangeTest {
 	}
 	
 	@Test
-	public void testSingleExchange() {
+	public void testSingleExchange() {	
 		network.exchange(1);
 		
 		Node n1 = network.getNodes().get("N1");
 		Node n2 = network.getNodes().get("N2");
 		Link l1 = network.getLinks().get("L1");
 		
-		TableEntry n1n2 = n1.getTable().getTable().get(n2);
-		TableEntry n2n1 = n2.getTable().getTable().get(n1);
+		TableEntry n1n2 = n1.getTable().getTable().get(n2.getName());
+		TableEntry n2n1 = n2.getTable().getTable().get(n1.getName());
 		
 		//Check that n2 is correctly added to n1's RT.
 		assertTrue(n1n2.getDestination().equals(n2));
@@ -52,5 +54,35 @@ public class ExchangeTest {
 		assertTrue(n2n1.getDistance() == 5);
 		assertTrue(n2n1.getOutgoingLink().equals(l1));
 	}
-
+	
+	/**
+	 * Test that updating the cost of a link is propogated correctly.
+	 */
+	@Test
+	public void testUpdateCost() {
+		network.exchange(1);
+		
+		Node n1 = network.getNodes().get("N1");
+		Node n2 = network.getNodes().get("N2");
+		Link l1 = network.getLinks().get("L1");
+		
+		//Check the entry for N2 in N1's RT before change
+		TableEntry expectedN2 = new TableEntry(n2, 5, l1);
+		assertTrue(n1.getTable().getEntry("N2").equals(expectedN2));
+		
+		//Check the entry for N1 in N2's RT before change
+		TableEntry expectedN1 = new TableEntry(n1, 5, l1);
+		assertTrue(n2.getTable().getEntry("N1").equals(expectedN1));
+		
+		//Do the link cost update.
+		l1.setCost(4);
+		
+		//Check the entry for N2 in N1's RT after change
+		expectedN2 = new TableEntry(n2, 4, l1);
+		assertTrue(n1.getTable().getEntry("N2").equals(expectedN2));
+		
+		//Check the entry for N1 in N2's RT after change
+		expectedN1 = new TableEntry(n1, 4, l1);
+		assertTrue(n2.getTable().getEntry("N1").equals(expectedN1));
+	}
 }

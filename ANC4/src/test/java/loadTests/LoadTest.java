@@ -25,5 +25,15 @@ public class LoadTest {
 		assertTrue(newNetwork.numNodes() == 2);
 		assertTrue(newNetwork.numLinks() == 1);
 	}
+	
+	@Test
+	public void loadNetwork3Nodes() {
+		String testFile = "src/main/resource/testset2";
+		
+		Network newNetwork = DataReader.parseFile(testFile);
+		
+		assertTrue(newNetwork.numNodes() == 3);
+		assertTrue(newNetwork.numLinks() == 3);
+	}
 
 }

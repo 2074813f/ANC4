@@ -22,17 +22,20 @@ public interface Network {
 
     /**
      * Update the cost of a link.
+     * 
+     * @param linkName - the name of the link to update
+     * @param newCost - the new cost to associate with that link
      **/
-    public void changeLinkCost(Link link, int newCost);
+    public void changeLinkCost(String linkName, int newCost);
 
     /**
      * Provide the best route from one Node to another across
      * the network.
      *
-     * @param source - the source node
-     * @param destination - the destination node
+     * @param sourceName - the name of the source node
+     * @param destName - the name of the destination node
      **/
-     public List<Device> bestRoute(Node source, Node destination);
+     public List<Node> bestRoute(String sourceName, String destName);
      
      /**
       * Return the number of nodes in the network.

@@ -28,6 +28,7 @@ public class DataReader {
 	 * @return - a new Network or null if an error occurred during parsing.
 	 */
 	public static Network parseFile(String filename) {
+		//TODO: Deal with and consider reporting duplicates.
 		int lineNumber = 0;
 		
 		Map<String, Node> nodes = new HashMap<String, Node>();
@@ -57,13 +58,10 @@ public class DataReader {
 					//If not existing nodes, add to nodes.
 					if (first == null) {
 						first = new Node(node1_name);
-						
 						nodes.put(node1_name, first);
 					}
-					
 					if (second == null) {
 						second = new Node(node2_name);
-						
 						nodes.put(node2_name, second);
 					}
 					
@@ -78,12 +76,13 @@ public class DataReader {
 				currentLine = reader.readLine();
 			}
 			
+			//TODO:change to Node.dvUpdate to get queue entries.
 			//##### POPULATE ROUTING TABLES #####
-			for (Link link : links.values()) {
-				//Populate each nodes routing tables with neighbor.
-				link.getFirst().getTable().addEntry(link.getSecond(), new TableEntry(link.getSecond(), link.getCost(), link));
-				link.getSecond().getTable().addEntry(link.getFirst(), new TableEntry(link.getFirst(), link.getCost(), link));
-			}
+//			for (Link link : links.values()) {
+//				//Populate each nodes routing tables with neighbor.
+//				link.getFirst().getTable().addEntry(link.getSecond().getName(), new TableEntry(link.getSecond(), link.getCost(), link));
+//				link.getSecond().getTable().addEntry(link.getFirst().getName(), new TableEntry(link.getFirst(), link.getCost(), link));
+//			}
 			
 			//File read, now construct network.
 			Network newNetwork = new SimpleNetwork(nodes, links);
