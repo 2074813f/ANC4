@@ -21,6 +21,17 @@ public interface Network {
      * 			 else false.
      **/
     public boolean exchange(int iterations);
+    
+    /**
+     * As: exchange(...), but traces each iteration for a given
+     * set of nodes.
+     * 
+     * @param iterations - no. of exchanges to do...
+     * @param nodesToTrace - the list of nodes whose routing tables to output to console.
+     * @return - true if stability was achieved in <= iterations
+     * 			 else false.
+     */
+    public boolean exchangeWithTrace(int iterations, List<Node> nodesToTrace);
 
     /**
      * Update the cost of a link.
@@ -63,5 +74,6 @@ public interface Network {
  	
 	public Map<String, Link> getLinks();
 	
+	public void setSplitHorizon(boolean value);
 	public boolean isSplitHorizon();
 }

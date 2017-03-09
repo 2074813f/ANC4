@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import routing.table.RoutingTable;
 import routing.table.TableEntry;
 
 /**
@@ -49,9 +50,29 @@ public class SimpleNetwork implements Network {
 				Update currentUpdate = updateQueue.remove(0);
 				
 				//Perform the update.
-				currentUpdate.getDest().dvUpdate(
+				//Iff split horizon capability active, then trim table before broadcasting.
+				if (splitHorizon == true) {
+					RoutingTable SHTable = new RoutingTable();
+					
+					//Iterate through entries, adding iff not outgoing on current link.
+					for (Entry<String, TableEntry> entry : 
+						currentUpdate.getSource().getTable().getTable().entrySet()) {
+						
+						if (entry.getValue().getOutgoingLink() != currentUpdate.getLink()) {
+							SHTable.addEntry(entry.getKey(), entry.getValue());
+						}
+					}
+					
+					currentUpdate.getDest().dvUpdate(
+							currentUpdate.getLink(), 
+							SHTable);
+				}
+				//Else broadcast full table as normal.
+				else {
+					currentUpdate.getDest().dvUpdate(
 						currentUpdate.getLink(), 
 						currentUpdate.getSource().getTable());
+				}
 			}
 			
 			//Populate the queue with requested updates.
@@ -71,6 +92,81 @@ public class SimpleNetwork implements Network {
 		else return false;
 	}
 	
+	@Override
+	public boolean exchangeWithTrace(int iterations, List<Node> nodesToTrace) {
+		//Check valid iterations.
+		if (iterations <= 0) {
+			String message = String.format("Invalid number of iterations: %s", iterations);
+			System.out.println(message);
+			System.out.println("Iterations must be > 0");
+		}
+		
+		//Perform exchange <iterations> times.
+		for (int i=0; i<iterations; i++) {
+			//Execute Updates.
+			while(!updateQueue.isEmpty()) {
+				Update currentUpdate = updateQueue.remove(0);
+				
+				//Perform the update.
+				//Iff split horizon capability active, then trim table before broadcasting.
+				if (splitHorizon == true) {
+					RoutingTable SHTable = new RoutingTable();
+					
+					//Iterate through entries, adding iff not outgoing on current link.
+					for (Entry<String, TableEntry> entry : 
+						currentUpdate.getSource().getTable().getTable().entrySet()) {
+						
+						if (entry.getValue().getOutgoingLink() != currentUpdate.getLink()) {
+							SHTable.addEntry(entry.getKey(), entry.getValue());
+						}
+					}
+					
+					currentUpdate.getDest().dvUpdate(
+							currentUpdate.getLink(), 
+							SHTable);
+				}
+				//Else broadcast full table as normal.
+				else {
+					currentUpdate.getDest().dvUpdate(
+						currentUpdate.getLink(), 
+						currentUpdate.getSource().getTable());
+				}
+			}
+			
+			//Populate the queue with requested updates.
+			//NOTE: we do first iteration without population for discovery exchange.
+			populateQueue();
+			
+			//##### Output to console #####
+			StringBuilder builder = new StringBuilder();
+			builder.append(String.format("##########\nIteration: %d\n\n", i));
+				
+			//Output the routing tables for requested nodes.
+			nodesToTrace.forEach(node -> builder.append(node.toString() + "\n"));
+			System.out.println(builder.toString());
+			
+			//If stability achieved, then exit immediately.
+			if (this.isStable()) {
+				return true;
+			}
+		}
+		
+		//Exit, indicating stability.
+		if (this.isStable()) {
+			return true;
+		}
+		else return false;
+	}
+	
+	/**
+	 * Populate the update queue with all pending requested updates.
+	 * 
+	 * i.e. iterate through all links, checking if nodes on either end
+	 * need to broadcast an update across it. If so, then add to an update queue
+	 * to be executed later, and set the flag in the node to indicate that it
+	 * no longer requires an update.
+	 * 
+	 */
 	private void populateQueue() {
 		//Populate queue.
 		for (Entry<String, Link> entry : links.entrySet()) {
@@ -173,7 +269,7 @@ public class SimpleNetwork implements Network {
 
 	@Override
 	public boolean isStable() {
-		return updateQueue.size() == 0;
+		return (updateQueue.size() == 0);
 	}
 	
 	@Override
@@ -193,6 +289,10 @@ public class SimpleNetwork implements Network {
 	@Override
 	public Map<String, Link> getLinks() {
 		return links;
+	}
+	@Override
+	public void setSplitHorizon(boolean value) {
+		this.splitHorizon = value;
 	}
 	@Override
 	public boolean isSplitHorizon() {

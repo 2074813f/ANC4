@@ -81,8 +81,8 @@ public class Node {
 				this.table.addEntry(nodeName, newEntry);
 				this.updated = true;
 			}
-			else if ((newDistance < existing.getDistance())
-					|| ((link == existing.getOutgoingLink()) && (newDistance != existing.getDistance()))) {
+			else if ((newDistance < existing.getDistance()) ){
+//					|| ((link == existing.getOutgoingLink()) && (newDistance != existing.getDistance()))) {
 				
 				/* Construct a new entry with:
 				 * 	- dest = table entry node

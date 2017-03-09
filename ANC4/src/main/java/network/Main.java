@@ -12,11 +12,13 @@ public class Main {
 	
 	final static String options = "Options:\n"
 			+ "- \"exchange\" <no. iterations>\n"
-			+ "- \"splithorizon\" <true|false>\n" 	//TODO
+			+ "- \"splithorizon\" <true|false>\n"
 			+ "- \"best-route\" <source> <dest>\n"
 			+ "- \"exchange-with-change\" <no. of iterations> <link to change> <new cost> <fail after>\n"
 			+ "- \"exchange-with-trace\" <no. of iterations> <node 1> <node 2> ... <node n>\n"
 			+ "- \"network\"\n"
+			+ "- \"change-link\" <link to change> <new cost>\n"
+			+ "- \"reset\"\n"
 			+ "- \"exit\"";
 
 	public static void main(String[] args) {
@@ -37,7 +39,7 @@ public class Main {
 			while(true) {
 				String[] tokens = input.split(" ");
 				
-				//##### "help" #####
+				//##### "options" #####
 				if (tokens[0].compareTo("options") == 0) {
 					System.out.println(options);
 				}
@@ -51,6 +53,12 @@ public class Main {
 					
 					String output = String.format("Completed exchange(s), exited with network stable: %s", stable);
 					System.out.println(output);
+				}
+				//##### "split-horizon" #####
+				else if (tokens[0].compareTo("split-horizon") == 0) {
+					network.setSplitHorizon(Boolean.valueOf(tokens[1]));
+					
+					System.out.println("Split horizon flag set: " + tokens[1]);
 				}
 				//##### "exchange-with-change" #####
 				else if (tokens[0].compareTo("exchange-with-changes") == 0) {
@@ -70,26 +78,18 @@ public class Main {
 				else if (tokens[0].compareTo("exchange-with-trace") == 0) {
 					List<Node> nodesToTrace = new ArrayList<Node>();
 					
-					//Get the list of nodes to trace.
-					for (int i=2; i<tokens.length; i++) {
-						nodesToTrace.add(network.getNodes().get(tokens[i]));
+					//If no Node arguments given then use all nodes.
+					if (tokens.length == 2) {
+						nodesToTrace.addAll(network.getNodes().values());
 					}
-					
-					boolean stable = network.isStable();
-					
-					//Do the iterations
-					for (int iter=0; iter<Integer.parseInt(tokens[1]); iter++) {
-						StringBuilder builder = new StringBuilder();
-						builder.append(String.format("##########\nIteration: %d\n\n", iter));
-						
-						//Do one iteration.
-						stable = network.exchange(1);
-						
-						//Output the routing tables for requested nodes.
-						nodesToTrace.forEach(node -> builder.append(node.toString() + "\n"));
-						
-						System.out.println(builder.toString());
+					else {
+						//Get the list of nodes to trace.
+						for (int i=2; i<tokens.length; i++) {
+							nodesToTrace.add(network.getNodes().get(tokens[i]));
+						}
 					}
+
+					boolean stable = network.exchangeWithTrace(Integer.parseInt(tokens[1]), nodesToTrace);
 					
 					String output = String.format("Completed exchange(s), exited with network stable: %s", stable);
 					System.out.println(output);
@@ -112,8 +112,21 @@ public class Main {
 					
 					System.out.println(builder.toString());
 				}
+				//##### "change-link" #####
+				else if (tokens[0].compareTo("change-link") == 0) {
+					network.changeLinkCost(tokens[1], Integer.parseInt(tokens[2]));
+					
+					System.out.println(String.format("Changed link cost of %s to %d.", tokens[1], Integer.parseInt(tokens[2])));
+				}
+				//##### "network" #####
 				else if (tokens[0].compareTo("network") == 0) {
 					System.out.println(network.toString());
+				}
+				//##### "reset" #####
+				else if (tokens[0].compareTo("reset") == 0) {
+					network = DataReader.parseFile(filename);
+					
+					System.out.println("Reset network.");
 				}
 				//NO MATCH
 				else {

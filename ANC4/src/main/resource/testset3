@@ -1,0 +1,7 @@
+node N1
+node N2
+node N3
+node N4
+link L1 N1 N2 1
+link L2 N2 N3 1
+link L3 N3 N4 1
