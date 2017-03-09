@@ -12,7 +12,7 @@ import routing.table.TableEntry;
  * @author Adam
  *
  */
-public class Node implements Device {
+public class Node {
 	
 	private String name;
 	private RoutingTable table;
@@ -49,8 +49,8 @@ public class Node implements Device {
 	 * link the update is received on + distance given is <
 	 * current distance.
 	 * 
-	 *TODO: update params
-	 * @param entry - the incoming table to check.
+	 * @param link - the link that the DV is from.
+	 * @param incomingTable - the routing table from the neighbor.
 	 */
 	public void dvUpdate(Link link, RoutingTable incomingTable) {
 		//Assume no routing table update occurred until it does.
@@ -83,9 +83,6 @@ public class Node implements Device {
 			}
 			else if ((newDistance < existing.getDistance())
 					|| ((link == existing.getOutgoingLink()) && (newDistance != existing.getDistance()))) {
-				
-				boolean testLinkEquals = (link == existing.getOutgoingLink());
-				boolean testDistanceEquals = (newDistance != existing.getDistance());
 				
 				/* Construct a new entry with:
 				 * 	- dest = table entry node
@@ -130,5 +127,27 @@ public class Node implements Device {
 	}
 	public void setUpdated(boolean updated) {
 		this.updated = updated;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		
+		builder.append(name + ": ");
+		
+		//For each TableEntry in RT for node.
+		for (Entry<String, TableEntry> nodeEntry : table.getTable().entrySet()) {
+			builder.append('[');
+			builder.append(nodeEntry.getValue().getDestination().getName() + ", ");	//Destination
+			builder.append(nodeEntry.getValue().getDistance() + ", ");				//Distance
+			
+			Link outgoing = nodeEntry.getValue().getOutgoingLink();
+			String output = (outgoing == null) ? "~" : outgoing.getName();
+			builder.append(output);													//Outgoing Link
+			
+			builder.append(']');
+		}
+		
+		return builder.toString();
 	}
 }

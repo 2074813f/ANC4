@@ -33,9 +33,8 @@ public class SimpleNetwork implements Network {
     	populateQueue();
 	}
     
-    //TODO: Add capability: "until stability achieved"
 	@Override
-	public void exchange(int iterations) {
+	public boolean exchange(int iterations) {
 		//Check valid iterations.
 		if (iterations <= 0) {
 			String message = String.format("Invalid number of iterations: %s", iterations);
@@ -58,7 +57,18 @@ public class SimpleNetwork implements Network {
 			//Populate the queue with requested updates.
 			//NOTE: we do first iteration without population for discovery exchange.
 			populateQueue();
+			
+			//If stability achieved, then exit immediately.
+			if (this.isStable()) {
+				return true;
+			}
 		}
+		
+		//Exit, indicating stability.
+		if (this.isStable()) {
+			return true;
+		}
+		else return false;
 	}
 	
 	private void populateQueue() {
@@ -117,7 +127,7 @@ public class SimpleNetwork implements Network {
 		 * until the current node == destination.
 		 */
 		//TODO: Detect cycles.
-		while(currentNode.getName() != destName) {
+		while(currentNode.getName().compareTo(destName) != 0) {
 			//Get the next hop node.
 			TableEntry entry = currentNode.getTable().getEntry(destName);
 			
@@ -133,11 +143,13 @@ public class SimpleNetwork implements Network {
 			}
 			
 			//Update the current node -> next hop.
-			currentNode = entry.getDestination();
+			Link link = entry.getOutgoingLink();
+			if (link.getFirst() == currentNode) currentNode = link.getSecond();
+			else currentNode = link.getFirst();
 			
 			//Insert the new node into the route.
 			route.add(currentNode);
-		}
+		}		
 		
 		return route;
 	}
@@ -146,20 +158,12 @@ public class SimpleNetwork implements Network {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		
+		String header = "FORMAT: (Node: [<Destination>,<Distance>,<Outgoing Link>], ..., [<...>])\n----------\n";
+		builder.append(header);
+		
+		//For each node in network
 		for (Entry<String, Node> entry : nodes.entrySet()) {
-			builder.append(entry.getKey() + ": ");
-			
-			for (Entry<String, TableEntry> nodeEntry : entry.getValue().getTable().getTable().entrySet()) {
-				builder.append(nodeEntry.getValue().getDistance() + ", ");
-			}
-			
-			builder.append('(');
-			for (Entry<String, TableEntry> nodeEntry : entry.getValue().getTable().getTable().entrySet()) {
-				Link outgoing = nodeEntry.getValue().getOutgoingLink();
-				String output = (outgoing == null) ? "~" : outgoing.getName();
-				builder.append(output + ", ");
-			}
-			builder.append(')');
+			builder.append(entry.getValue().toString());
 			
 			builder.append("\n");
 		}

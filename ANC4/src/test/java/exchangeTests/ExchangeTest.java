@@ -8,8 +8,6 @@ import org.junit.Test;
 import network.Link;
 import network.Network;
 import network.Node;
-import network.SimpleNetwork;
-import routing.table.RoutingTable;
 import routing.table.TableEntry;
 import util.DataReader;
 

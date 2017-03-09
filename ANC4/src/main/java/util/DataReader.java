@@ -11,7 +11,6 @@ import network.Link;
 import network.Network;
 import network.Node;
 import network.SimpleNetwork;
-import routing.table.TableEntry;
 
 /**
  * Class exposing functionality to read files describing networks.
@@ -28,7 +27,6 @@ public class DataReader {
 	 * @return - a new Network or null if an error occurred during parsing.
 	 */
 	public static Network parseFile(String filename) {
-		//TODO: Deal with and consider reporting duplicates.
 		int lineNumber = 0;
 		
 		Map<String, Node> nodes = new HashMap<String, Node>();

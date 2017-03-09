@@ -17,8 +17,10 @@ public interface Network {
      * i.e. devices exchange routing information.
      *
      * @param iterations - no. of exchanges to do...
+     * @return - true if stability was achieved in <= iterations
+     * 			 else false.
      **/
-    public void exchange(int iterations);
+    public boolean exchange(int iterations);
 
     /**
      * Update the cost of a link.

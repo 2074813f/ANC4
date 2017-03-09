@@ -1,8 +1,5 @@
 package network;
 
-import routing.table.RoutingTable;
-import routing.table.TableEntry;
-
 /**
  * A link in a simplified
  * point-to-point network.
@@ -10,7 +7,7 @@ import routing.table.TableEntry;
  * @author Adam
  *
  */
-public class Link implements Device {
+public class Link {
 
 	String name;
 	Node first;
