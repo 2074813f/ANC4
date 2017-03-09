@@ -76,14 +76,6 @@ public class DataReader {
 				currentLine = reader.readLine();
 			}
 			
-			//TODO:change to Node.dvUpdate to get queue entries.
-			//##### POPULATE ROUTING TABLES #####
-//			for (Link link : links.values()) {
-//				//Populate each nodes routing tables with neighbor.
-//				link.getFirst().getTable().addEntry(link.getSecond().getName(), new TableEntry(link.getSecond(), link.getCost(), link));
-//				link.getSecond().getTable().addEntry(link.getFirst().getName(), new TableEntry(link.getFirst(), link.getCost(), link));
-//			}
-			
 			//File read, now construct network.
 			Network newNetwork = new SimpleNetwork(nodes, links);
 			return newNetwork;

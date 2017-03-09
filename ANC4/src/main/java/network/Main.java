@@ -13,6 +13,13 @@ public class Main {
 			System.err.println("No network established.");
 			System.exit(-1);
 		}
+		
+		for (int i=0; i<4; i++) {
+			System.out.println("Iteration: " + i);
+			System.out.println("Stable: " + network.isStable());
+			System.out.println(network.toString());
+			network.exchange(1);
+		}
 
 		//TODO: start simulation, step through
 		//TODO: CLI interface

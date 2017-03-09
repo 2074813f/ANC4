@@ -29,7 +29,7 @@ public class MultipleExchangeTest {
 	@Test
 	public void testUpdateCostT2() {
 		//Arbitrary exchanges until stable.
-		network.exchange(10);
+		network.exchange(5);
 		
 		Node n1 = network.getNodes().get("N1");
 		Node n2 = network.getNodes().get("N2");
@@ -64,7 +64,7 @@ public class MultipleExchangeTest {
 		
 		//Do another exchange
 		//N3 should learn that N1 is cheapest on L3 now.
-		network.exchange(1);
+		network.exchange(2);
 		
 		//Check the entry for N1 in N3's RT after change
 		expectedN1 = new TableEntry(n1, 5, l3);

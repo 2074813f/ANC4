@@ -49,6 +49,14 @@ public interface Network {
       */
      public int numLinks();
      
+ 	/**
+ 	 * Stability status of the network, i.e. are there still 
+ 	 * pending updates.
+ 	 * 
+ 	 * @return - true if network is stable else false.
+ 	 */
+     public boolean isStable();
+     
  	public Map<String, Node> getNodes();
  	
 	public Map<String, Link> getLinks();

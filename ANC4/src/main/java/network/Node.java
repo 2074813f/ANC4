@@ -65,12 +65,28 @@ public class Node implements Device {
 			/* Update the table if one of 3 conditions are met:
 			 * 	1. If node hasn't been seen , add entry
 			 * 	2. If new cost < existing cost, update entry.
-			 * 	3. If new route learned over same link as current best route, update.
+			 * 	3. If new route learned over same link as current best route 
+			 * 	   and distance != existing distance, update.
 			 */
 			TableEntry existing = this.table.getEntry(nodeName);
-			if (existing == null 
-					|| newDistance < existing.getDistance() 
-					|| link == existing.getOutgoingLink()) {
+			
+			if (existing == null) {
+				/* Construct a new entry with:
+				 * 	- dest = table entry node
+				 * 	- distance = <link cost> + <entry distance>
+				 * 	- outgoingLink = link
+				 */
+				TableEntry newEntry = new TableEntry(entry.getValue().getDestination(), newDistance, link);
+				
+				this.table.addEntry(nodeName, newEntry);
+				this.updated = true;
+			}
+			else if ((newDistance < existing.getDistance())
+					|| ((link == existing.getOutgoingLink()) && (newDistance != existing.getDistance()))) {
+				
+				boolean testLinkEquals = (link == existing.getOutgoingLink());
+				boolean testDistanceEquals = (newDistance != existing.getDistance());
+				
 				/* Construct a new entry with:
 				 * 	- dest = table entry node
 				 * 	- distance = <link cost> + <entry distance>
@@ -111,5 +127,8 @@ public class Node implements Device {
 	}
 	public boolean getUpdated() {
 		return this.updated;
+	}
+	public void setUpdated(boolean updated) {
+		this.updated = updated;
 	}
 }

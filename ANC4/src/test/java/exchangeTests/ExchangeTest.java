@@ -35,7 +35,7 @@ public class ExchangeTest {
 	
 	@Test
 	public void testSingleExchange() {	
-		network.exchange(1);
+		network.exchange(10);
 		
 		Node n1 = network.getNodes().get("N1");
 		Node n2 = network.getNodes().get("N2");
@@ -53,10 +53,13 @@ public class ExchangeTest {
 		assertTrue(n2n1.getDestination().equals(n1));
 		assertTrue(n2n1.getDistance() == 5);
 		assertTrue(n2n1.getOutgoingLink().equals(l1));
+		
+		assertTrue(network.isStable());
 	}
 	
 	/**
-	 * Test that updating the cost of a link is propogated correctly.
+	 * Test that updating the cost of a link is propogated instantly,
+	 * before exchange.
 	 */
 	@Test
 	public void testUpdateCost() {

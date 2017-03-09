@@ -21,11 +21,16 @@ public class SimpleNetwork implements Network {
     private Map<String, Node> nodes;	//Set of nodes in the network, by name.
     private Map<String, Link> links;	//Set of links in the network, by name.
     private boolean splitHorizon;		//Split-horizon capability flag.
+    private List<Update> updateQueue;	//Queue of Routing Table broadcasts for next iteration.
     
     public SimpleNetwork(Map<String, Node> nodes, Map<String, Link> links) {
     	this.nodes = nodes;
     	this.links = links;
     	this.splitHorizon = false;
+    	this.updateQueue = new LinkedList<Update>();
+    	
+    	//Populate Queue for initial discovery exchange.
+    	populateQueue();
 	}
     
     //TODO: Add capability: "until stability achieved"
@@ -40,23 +45,6 @@ public class SimpleNetwork implements Network {
 		
 		//Perform exchange <iterations> times.
 		for (int i=0; i<iterations; i++) {
-			//Queue of Routing Table broadcasts for this iteration.
-			//Queueing avoids infinite update loops and removes unnecessary updates.
-			List<Update> updateQueue = new LinkedList<Update>();
-			
-			//Populate queue.
-			for (Entry<String, Link> entry : links.entrySet()) {
-				Link link = entry.getValue();
-				
-				//If the routing table has changed, node requires broadcast.
-				if (link.getFirst().getUpdated() == true) {
-					updateQueue.add(new Update(link.getFirst(), link.getSecond(), link));
-				}
-				if (link.getSecond().getUpdated() == true) {
-					updateQueue.add(new Update(link.getSecond(), link.getFirst(), link));
-				}
-			}
-			
 			//Execute Updates.
 			while(!updateQueue.isEmpty()) {
 				Update currentUpdate = updateQueue.remove(0);
@@ -66,6 +54,30 @@ public class SimpleNetwork implements Network {
 						currentUpdate.getLink(), 
 						currentUpdate.getSource().getTable());
 			}
+			
+			//Populate the queue with requested updates.
+			//NOTE: we do first iteration without population for discovery exchange.
+			populateQueue();
+		}
+	}
+	
+	private void populateQueue() {
+		//Populate queue.
+		for (Entry<String, Link> entry : links.entrySet()) {
+			Link link = entry.getValue();
+			
+			//If the routing table has changed, node requires broadcast.
+			if (link.getFirst().getUpdated() == true) {
+				updateQueue.add(new Update(link.getFirst(), link.getSecond(), link));
+			}
+			if (link.getSecond().getUpdated() == true) {
+				updateQueue.add(new Update(link.getSecond(), link.getFirst(), link));
+			}
+		}
+		
+		//Set updated to false for all nodes, since we have queued updates for them.
+		for (Entry<String, Node> entry : nodes.entrySet()) {
+			entry.getValue().setUpdated(false);
 		}
 	}
 	
@@ -128,6 +140,36 @@ public class SimpleNetwork implements Network {
 		}
 		
 		return route;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		
+		for (Entry<String, Node> entry : nodes.entrySet()) {
+			builder.append(entry.getKey() + ": ");
+			
+			for (Entry<String, TableEntry> nodeEntry : entry.getValue().getTable().getTable().entrySet()) {
+				builder.append(nodeEntry.getValue().getDistance() + ", ");
+			}
+			
+			builder.append('(');
+			for (Entry<String, TableEntry> nodeEntry : entry.getValue().getTable().getTable().entrySet()) {
+				Link outgoing = nodeEntry.getValue().getOutgoingLink();
+				String output = (outgoing == null) ? "~" : outgoing.getName();
+				builder.append(output + ", ");
+			}
+			builder.append(')');
+			
+			builder.append("\n");
+		}
+		
+		return builder.toString();
+	}
+
+	@Override
+	public boolean isStable() {
+		return updateQueue.size() == 0;
 	}
 	
 	@Override
