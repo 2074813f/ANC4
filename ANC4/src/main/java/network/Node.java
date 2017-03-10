@@ -1,5 +1,7 @@
 package network;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map.Entry;
 
 import routing.table.RoutingTable;
@@ -18,10 +20,13 @@ public class Node {
 	private RoutingTable table;
 	private boolean updated;
 	
+	private List<Link> links;
+	
 	public Node(String name) {
 		this.name = name;
 		this.table = new RoutingTable();
 		this.updated = true;		//Set to true initially to cause broadcast to neighbors.
+		this.links = new ArrayList<Link>();
 		
 		//Add an entry for self in routing table.
 		this.table.addEntry(name, new TableEntry(this, 0, null));
@@ -53,9 +58,6 @@ public class Node {
 	 * @param incomingTable - the routing table from the neighbor.
 	 */
 	public void dvUpdate(Link link, RoutingTable incomingTable) {
-		//Assume no routing table update occurred until it does.
-		this.updated = false;
-		
 		for (Entry<String, TableEntry> entry : incomingTable.getTable().entrySet()) {
 			//Distance to this node = <link cost> + <entry distance>.
 			//see: Bellman-Ford algorithm. 
@@ -81,8 +83,8 @@ public class Node {
 				this.table.addEntry(nodeName, newEntry);
 				this.updated = true;
 			}
-			else if ((newDistance < existing.getDistance()) ){
-//					|| ((link == existing.getOutgoingLink()) && (newDistance != existing.getDistance()))) {
+			else if ((newDistance < existing.getDistance()) 
+					|| ((link == existing.getOutgoingLink()) && (newDistance != existing.getDistance()))) {
 				
 				/* Construct a new entry with:
 				 * 	- dest = table entry node
@@ -127,6 +129,15 @@ public class Node {
 	}
 	public void setUpdated(boolean updated) {
 		this.updated = updated;
+	}
+	public List<Link> getLinks() {
+		return this.links;
+	}
+	public void setLinks(List<Link> links) {
+		this.links = links;
+	}
+	public void addLink(Link link) {
+		this.links.add(link);
 	}
 	
 	@Override

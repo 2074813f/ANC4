@@ -62,4 +62,12 @@ public class TableEntry {
 	public void setOutgoingLink(Link outgoingLink) {
 		this.outgoingLink = outgoingLink;
 	}
+	
+	@Override
+	public String toString() {
+		String stringRepr = String.format("{%s, %s, %s}", 
+				this.destination.getName(), this.distance, this.outgoingLink);
+		
+		return stringRepr;
+	}
 }

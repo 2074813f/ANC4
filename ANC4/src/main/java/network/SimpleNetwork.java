@@ -169,21 +169,27 @@ public class SimpleNetwork implements Network {
 	 */
 	private void populateQueue() {
 		//Populate queue.
-		for (Entry<String, Link> entry : links.entrySet()) {
-			Link link = entry.getValue();
-			
-			//If the routing table has changed, node requires broadcast.
-			if (link.getFirst().getUpdated() == true) {
-				updateQueue.add(new Update(link.getFirst(), link.getSecond(), link));
-			}
-			if (link.getSecond().getUpdated() == true) {
-				updateQueue.add(new Update(link.getSecond(), link.getFirst(), link));
-			}
-		}
-		
-		//Set updated to false for all nodes, since we have queued updates for them.
 		for (Entry<String, Node> entry : nodes.entrySet()) {
-			entry.getValue().setUpdated(false);
+			Node currentNode = entry.getValue();
+			
+			if (currentNode.getUpdated()) {
+				//Iterate over links for each node.
+				for (Link link : currentNode.getLinks()) {
+					//XXX: Check if the link is down.
+					//...
+					
+					//Get the link node that is not this node, update TO it.
+					if (link.getFirst() != currentNode) {
+						updateQueue.add(new Update(currentNode, link.getFirst(), link));
+					}
+					else {
+						updateQueue.add(new Update(currentNode, link.getSecond(), link));
+					}
+				}
+				
+				//Updates queued so Node no longer requires.
+				currentNode.setUpdated(false);
+			}
 		}
 	}
 	

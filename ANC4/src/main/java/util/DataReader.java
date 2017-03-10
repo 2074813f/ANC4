@@ -6,6 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import network.Link;
 import network.Network;
@@ -72,6 +73,14 @@ public class DataReader {
 				
 				lineNumber++;
 				currentLine = reader.readLine();
+			}
+			
+			//Iterate over links and add refs to nodes.
+			for (Entry<String, Link> entry : links.entrySet()) {
+				Link currentLink = entry.getValue();
+				
+				currentLink.getFirst().addLink(currentLink);
+				currentLink.getSecond().addLink(currentLink);
 			}
 			
 			//File read, now construct network.
