@@ -5,11 +5,11 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import network.DataReader;
 import network.Link;
 import network.Network;
 import network.Node;
-import routing.table.TableEntry;
-import util.DataReader;
+import network.TableEntry;
 
 /**
  * Set of tests that check the "exchange" functionality of a network.

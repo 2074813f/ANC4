@@ -12,11 +12,13 @@ public class Update {
 	private Node source;
 	private Node dest;
 	private Link link;
+	private RoutingTable table;
 	
 	public Update(Node source, Node dest, Link link) {
 		this.source = source;
 		this.dest = dest;
 		this.link = link;
+		this.table = table;
 	}
 	
 	
@@ -28,5 +30,8 @@ public class Update {
 	}
 	public Link getLink() {
 		return link;
+	}
+	public RoutingTable getTable() {
+		return table;
 	}
 }

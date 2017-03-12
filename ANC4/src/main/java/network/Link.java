@@ -14,11 +14,15 @@ public class Link {
 	Node second;
 	int cost;
 	
+	boolean down;	//Is the link down.
+	
 	public Link(String name, Node first, Node second, int cost) {
 		this.name = name;
 		this.first = first;
 		this.second = second;
 		this.cost = cost;
+		
+		this.down = false;
 	}
 	
 	/**
@@ -67,5 +71,12 @@ public class Link {
 	}
 	public Node getSecond() {
 		return second;
+	}
+
+	public boolean isDown() {
+		return down;
+	}
+	public void setDown(boolean down) {
+		this.down = down;
 	}
 }

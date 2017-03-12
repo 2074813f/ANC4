@@ -1,9 +1,6 @@
-package routing.table;
+package network;
 
 import java.util.Map.Entry;
-
-import network.Link;
-import network.Node;
 
 /**
  * An entry in a routing table of a Node,

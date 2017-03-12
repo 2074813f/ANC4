@@ -6,8 +6,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import util.DataReader;
-
 public class Main {
 	
 	final static String options = "Options:\n"
@@ -115,9 +113,17 @@ public class Main {
 					}
 					//##### "change-link" #####
 					else if (tokens[0].compareTo("change-link") == 0) {
-						network.changeLinkCost(tokens[1], Integer.parseInt(tokens[2]));
+						int newCost = Integer.parseInt(tokens[2]);
 						
-						System.out.println(String.format("Changed link cost of %s to %d.", tokens[1], Integer.parseInt(tokens[2])));
+						//Represent dead link with cost +ve infinite.
+						if (newCost == -1) {
+							network.changeLinkCost(tokens[1], Integer.MAX_VALUE);
+							System.out.println(String.format("Set link %s == dead.", tokens[1]));
+						}
+						else {
+							network.changeLinkCost(tokens[1], newCost);
+							System.out.println(String.format("Changed link cost of %s to %d.", tokens[1], Integer.parseInt(tokens[2])));
+						}
 					}
 					//##### "network" #####
 					else if (tokens[0].compareTo("network") == 0) {

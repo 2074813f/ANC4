@@ -1,4 +1,4 @@
-package util;
+package network;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -7,11 +7,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import network.Link;
-import network.Network;
-import network.Node;
-import network.SimpleNetwork;
 
 /**
  * Class exposing functionality to read files describing networks.

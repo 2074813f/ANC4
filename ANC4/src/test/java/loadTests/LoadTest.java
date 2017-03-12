@@ -4,8 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import network.DataReader;
 import network.Network;
-import util.DataReader;
 
 /**
  * Set of tests that check the capability to read in a file

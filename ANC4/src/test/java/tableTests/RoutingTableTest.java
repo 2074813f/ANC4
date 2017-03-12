@@ -4,10 +4,10 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import network.DataReader;
 import network.Network;
 import network.Node;
-import routing.table.RoutingTable;
-import util.DataReader;
+import network.RoutingTable;
 
 public class RoutingTableTest {
 	

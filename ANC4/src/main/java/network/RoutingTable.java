@@ -1,11 +1,8 @@
-package routing.table;
+package network;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import network.Link;
-import network.Node;
 
 /**
  * The routing table for a node in a simplified point-to-point

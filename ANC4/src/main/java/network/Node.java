@@ -4,9 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
-import routing.table.RoutingTable;
-import routing.table.TableEntry;
-
 /**
  * A node in a simplified
  * point-to-point network.
@@ -60,8 +57,14 @@ public class Node {
 	public void dvUpdate(Link link, RoutingTable incomingTable) {
 		for (Entry<String, TableEntry> entry : incomingTable.getTable().entrySet()) {
 			//Distance to this node = <link cost> + <entry distance>.
-			//see: Bellman-Ford algorithm. 
-			int newDistance = link.getCost() + entry.getValue().getDistance();
+			//see: Bellman-Ford algorithm.
+			int newDistance;
+			if (link.isDown()) {
+				newDistance = Integer.MAX_VALUE;
+			}
+			else {
+				newDistance = link.getCost() + entry.getValue().getDistance();
+			}
 			String nodeName = entry.getValue().getDestination().getName();
 			
 			/* Update the table if one of 3 conditions are met:

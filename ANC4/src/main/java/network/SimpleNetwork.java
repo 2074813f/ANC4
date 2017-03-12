@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import routing.table.RoutingTable;
-import routing.table.TableEntry;
-
 /**
  * A simplified point-to-point network.
  * 
@@ -175,15 +172,25 @@ public class SimpleNetwork implements Network {
 			if (currentNode.getUpdated()) {
 				//Iterate over links for each node.
 				for (Link link : currentNode.getLinks()) {
-					//XXX: Check if the link is down.
-					//...
-					
-					//Get the link node that is not this node, update TO it.
-					if (link.getFirst() != currentNode) {
-						updateQueue.add(new Update(currentNode, link.getFirst(), link));
-					}
-					else {
-						updateQueue.add(new Update(currentNode, link.getSecond(), link));
+					//Check if the link is down.
+					//If down then do not do propagate updates across it.
+					if (link.down == false) {
+						//Copy the routing table entries.
+						RoutingTable tableCopy = new RoutingTable();
+						for (Entry<String, TableEntry> tableEntry : currentNode.getTable().getTable().entrySet()) {
+							tableCopy.addEntry(tableEntry.getKey(),
+									new TableEntry(tableEntry.getValue().getDestination(),
+											tableEntry.getValue().getDistance(),
+											tableEntry.getValue().getOutgoingLink()));
+						}
+						
+						//Get the link node that is not this node, update TO it.
+						if (link.getFirst() != currentNode) {
+							updateQueue.add(new Update(currentNode, link.getFirst(), link));
+						}
+						else {
+							updateQueue.add(new Update(currentNode, link.getSecond(), link));
+						}
 					}
 				}
 				
@@ -193,11 +200,40 @@ public class SimpleNetwork implements Network {
 		}
 	}
 	
+	/**
+	 * Construct a copy of a routing table. For use when creating updates to
+	 * snapshot state of node at instance of time, to preserve current state.
+	 * 
+	 * @param node - the node whose table to copy.
+	 * @return - a RoutingTable copy.
+	 */
+	private RoutingTable copyTable(Node node) {
+		//TODO: split horizon
+		//Copy the routing table entries.
+		RoutingTable tableCopy = new RoutingTable();
+		for (Entry<String, TableEntry> tableEntry : node.getTable().getTable().entrySet()) {
+			tableCopy.addEntry(tableEntry.getKey(),
+					new TableEntry(tableEntry.getValue().getDestination(),
+							tableEntry.getValue().getDistance(),
+							tableEntry.getValue().getOutgoingLink()));
+		}
+		
+		return tableCopy;
+	}
+	
 	@Override
 	public void changeLinkCost(String linkName, int newCost) throws RuntimeException {
 		Link link = links.get(linkName);
 
 		if (link != null) {
+			//Check for link down specification.
+			if (newCost == Integer.MAX_VALUE) {
+				link.setDown(true);
+			}
+			else {
+				link.setDown(false);
+			}
+			
 			link.setCost(newCost);
 		}
 		else {
