@@ -45,31 +45,10 @@ public class SimpleNetwork implements Network {
 			//Execute Updates.
 			while(!updateQueue.isEmpty()) {
 				Update currentUpdate = updateQueue.remove(0);
-				
-				//Perform the update.
-				//Iff split horizon capability active, then trim table before broadcasting.
-				if (splitHorizon == true) {
-					RoutingTable SHTable = new RoutingTable();
-					
-					//Iterate through entries, adding iff not outgoing on current link.
-					for (Entry<String, TableEntry> entry : 
-						currentUpdate.getSource().getTable().getTable().entrySet()) {
-						
-						if (entry.getValue().getOutgoingLink() != currentUpdate.getLink()) {
-							SHTable.addEntry(entry.getKey(), entry.getValue());
-						}
-					}
-					
-					currentUpdate.getDest().dvUpdate(
+
+				currentUpdate.getDest().dvUpdate(
 							currentUpdate.getLink(), 
-							SHTable);
-				}
-				//Else broadcast full table as normal.
-				else {
-					currentUpdate.getDest().dvUpdate(
-						currentUpdate.getLink(), 
-						currentUpdate.getSource().getTable());
-				}
+							currentUpdate.getTable());
 			}
 			
 			//Populate the queue with requested updates.
@@ -103,31 +82,10 @@ public class SimpleNetwork implements Network {
 			//Execute Updates.
 			while(!updateQueue.isEmpty()) {
 				Update currentUpdate = updateQueue.remove(0);
-				
-				//Perform the update.
-				//Iff split horizon capability active, then trim table before broadcasting.
-				if (splitHorizon == true) {
-					RoutingTable SHTable = new RoutingTable();
-					
-					//Iterate through entries, adding iff not outgoing on current link.
-					for (Entry<String, TableEntry> entry : 
-						currentUpdate.getSource().getTable().getTable().entrySet()) {
-						
-						if (entry.getValue().getOutgoingLink() != currentUpdate.getLink()) {
-							SHTable.addEntry(entry.getKey(), entry.getValue());
-						}
-					}
-					
-					currentUpdate.getDest().dvUpdate(
+
+				currentUpdate.getDest().dvUpdate(
 							currentUpdate.getLink(), 
-							SHTable);
-				}
-				//Else broadcast full table as normal.
-				else {
-					currentUpdate.getDest().dvUpdate(
-						currentUpdate.getLink(), 
-						currentUpdate.getSource().getTable());
-				}
+							currentUpdate.getTable());
 			}
 			
 			//Populate the queue with requested updates.
@@ -176,20 +134,14 @@ public class SimpleNetwork implements Network {
 					//If down then do not do propagate updates across it.
 					if (link.down == false) {
 						//Copy the routing table entries.
-						RoutingTable tableCopy = new RoutingTable();
-						for (Entry<String, TableEntry> tableEntry : currentNode.getTable().getTable().entrySet()) {
-							tableCopy.addEntry(tableEntry.getKey(),
-									new TableEntry(tableEntry.getValue().getDestination(),
-											tableEntry.getValue().getDistance(),
-											tableEntry.getValue().getOutgoingLink()));
-						}
+						RoutingTable tableCopy = copyTable(currentNode, link);
 						
 						//Get the link node that is not this node, update TO it.
 						if (link.getFirst() != currentNode) {
-							updateQueue.add(new Update(currentNode, link.getFirst(), link));
+							updateQueue.add(new Update(currentNode, link.getFirst(), link, tableCopy));
 						}
 						else {
-							updateQueue.add(new Update(currentNode, link.getSecond(), link));
+							updateQueue.add(new Update(currentNode, link.getSecond(), link, tableCopy));
 						}
 					}
 				}
@@ -207,15 +159,17 @@ public class SimpleNetwork implements Network {
 	 * @param node - the node whose table to copy.
 	 * @return - a RoutingTable copy.
 	 */
-	private RoutingTable copyTable(Node node) {
-		//TODO: split horizon
+	private RoutingTable copyTable(Node node, Link currentLink) {
 		//Copy the routing table entries.
 		RoutingTable tableCopy = new RoutingTable();
 		for (Entry<String, TableEntry> tableEntry : node.getTable().getTable().entrySet()) {
-			tableCopy.addEntry(tableEntry.getKey(),
+			//Iterate through entries, adding iff not outgoing on current link. (Iff splithorizon == true)
+			if (splitHorizon == false || tableEntry.getValue().getOutgoingLink() != currentLink) {
+				tableCopy.addEntry(tableEntry.getKey(),
 					new TableEntry(tableEntry.getValue().getDestination(),
 							tableEntry.getValue().getDistance(),
 							tableEntry.getValue().getOutgoingLink()));
+			}
 		}
 		
 		return tableCopy;

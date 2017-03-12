@@ -59,7 +59,7 @@ public class Node {
 			//Distance to this node = <link cost> + <entry distance>.
 			//see: Bellman-Ford algorithm.
 			int newDistance;
-			if (link.isDown()) {
+			if (entry.getValue().getDistance() == Integer.MAX_VALUE) {
 				newDistance = Integer.MAX_VALUE;
 			}
 			else {
@@ -115,7 +115,15 @@ public class Node {
 			
 			//If the node is using the link to neighbor, update its cost.
 			if (current.getOutgoingLink() == link) {
-				current.setDistance(current.getDistance() + costChange);
+				
+				//Check for dead link.
+				if (costChange == Integer.MAX_VALUE) {
+					current.setDistance(Integer.MAX_VALUE);
+				}
+				else {
+					current.setDistance(current.getDistance() + costChange);
+				}
+				
 				this.updated = true;
 			}
 		}

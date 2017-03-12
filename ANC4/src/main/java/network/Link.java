@@ -45,7 +45,8 @@ public class Link {
 	}
 	
 	/**
-	 * Updates the cost associated with the link.
+	 * Updates the cost associated with the link. A new cost of
+	 * Integer.MAX_VALUE represents a dead link.
 	 * 
 	 * NOTE: for simplicity this causes the RT entries for
 	 * linked neighbors to be updated/checked immediately.
@@ -55,7 +56,14 @@ public class Link {
 	public void setCost(int cost) {
 		//Change in cost = old cost - new cost.
 		//Difference is then summed with old entries to give new distance.
-		int costChange = cost - this.cost;
+		int costChange;
+		
+		if (cost == Integer.MAX_VALUE) {
+			costChange = Integer.MAX_VALUE;
+		}
+		else {
+			costChange = cost - this.cost;
+		}
 		
 		first.linkUpdate(this, costChange);
 		second.linkUpdate(this, costChange);

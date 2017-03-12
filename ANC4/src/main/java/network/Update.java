@@ -14,11 +14,11 @@ public class Update {
 	private Link link;
 	private RoutingTable table;
 	
-	public Update(Node source, Node dest, Link link) {
+	public Update(Node source, Node dest, Link link, RoutingTable tableCopy) {
 		this.source = source;
 		this.dest = dest;
 		this.link = link;
-		this.table = table;
+		this.table = tableCopy;
 	}
 	
 	
